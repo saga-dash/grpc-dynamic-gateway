@@ -84,7 +84,7 @@ const middleware = (protoFiles, grpcLocation, credentials = requiredGrpc.credent
  * @return {Object}      params for gRPC client
  */
 const convertParams = (req, url) => {
-  const gparams = getParamsList(url)
+  const gparams = getParamsList(req.url)
   const out = req.body
   gparams.forEach(p => {
     if (req.query && req.query[p]) {
@@ -94,12 +94,6 @@ const convertParams = (req, url) => {
       out[p] = req.params[p]
     }
   })
-  let result = urlmodule.parse(req.url, true);
-  if (result.query) {
-    for (const key in result.query) {
-      out[key] = result.query[key];
-    }
-  }
   return out
 }
 
@@ -141,6 +135,10 @@ const getParamsList = (url) => {
       paramRegex.lastIndex++
     }
     out.push(m[1])
+  }
+  let result = urlmodule.parse(url, true);
+  for (const key in result.query) {
+    out.push(key)
   }
   return out
 }
